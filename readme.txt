@@ -12,12 +12,12 @@ Replacement of the category widget to allow for greater customization of the cat
 
 Replacement of the category widget to allow for greater customization of the category widget. The following options have been implemented:
 
-*	Display as List or Dropdown
-*	Show number of posts (Count) after the category
-*	Hide empty categories
-*	Show categories hierarchical.
-*	Sort by ID, Name,Count.
-*	Sort ascending or descending.
+* Display as List or Dropdown
+* Show number of posts (Count) after the category
+* Hide empty categories
+* Show categories hierarchical.
+* Sort by ID, Name,Count.
+* Sort ascending or descending.
 
 == Installation ==
 
