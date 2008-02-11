@@ -12,20 +12,19 @@ Replacement of the category widget to allow for greater customization of the cat
 
 Replacement of the category widget to allow for greater customization of the category widget. The following options have been implemented:
 
-    * Display as List or Dropdown
-    * Show number of posts (Count) after the category
-    * Hide empty categories
-    * Show categories hierarchical.
-    * Sort by ID, Name,Count.
-    * Sort ascending or descending.
+*	Display as List or Dropdown
+*	Show number of posts (Count) after the category
+*	Hide empty categories
+*	Show categories hierarchical.
+*	Sort by ID, Name,Count.
+*	Sort ascending or descending.
 
 == Installation ==
 
 The Extended Categories Widget can be installed in 3 easy steps:
-   1. Unzip "Extended Categories" archive and put the directory "extended-categories" into your "plugins" folder (wp-content/plugins/).
-   ent/plugins directory.
-   2. Activate the plugin
-   3. Go to the Presentation->Widgets page and drag the widget into the sidebar of your choice. Configuration of the widget is done like all other widgets.
+1. Unzip "Extended Categories" archive and put the directory "extended-categories" into your "plugins" folder (wp-content/plugins/).
+2. Activate the plugin
+3. Go to the Presentation->Widgets page and drag the widget into the sidebar of your choice. Configuration of the widget is done like all other widgets.
 
 == Frequently Asked Questions ==
 None so far
@@ -39,4 +38,4 @@ None
 * Version 1.1
 	* Dropdown menu didn't work. Page wasn't refreshed with selected category.
 * Version 1.0
-        * Initial version
+ 	* Initial version
