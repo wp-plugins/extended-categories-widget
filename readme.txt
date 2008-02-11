@@ -31,7 +31,9 @@ The Extended Categories Widget can be installed in 3 easy steps:
 
 
 == Frequently Asked Questions ==
-None so far
+
+= What about support? =
+I created a support site at http://forums.avirtualhome.com where you can ask questions or request features.
 
 == Screenshots ==
 None
