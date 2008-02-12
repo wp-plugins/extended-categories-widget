@@ -48,12 +48,12 @@ function widget_extended_categories_init() {
 		echo $before_title . $title . $after_title;
 		?>
 <ul>
-                <?php
+<?php
 		if ( $style == 'list' ) {
 			wp_list_categories ( $cat_args );
 		} else {
 			wp_dropdown_categories ( $cat_args );
-			?>
+			?> 
                         <script lang='javascript'><!--
                         var dropdown = document.getElementById("cat");
                         function onCatChange() {
@@ -66,14 +66,11 @@ function widget_extended_categories_init() {
                         dropdown.onchange = onCatChange;
 --></script>
 <?php
-		
 		}
 		?>
                 </ul>
 <?php
 		echo $after_widget;
-		?>
-    <?php
 	}
 
 	function widget_extended_categories_control() {
