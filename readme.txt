@@ -3,7 +3,7 @@ Contributors: petervanderdoes
 Donate link: http://blog.avirtualhome.com/wordpress-plugins/
 Tags: 2.3, categories, widget
 Requires at least: 2.3
-Tested up to: 2.3.2
+Tested up to: 2.3.3
 Stable tag: 1.2
 
 Replacement of the category widget to allow for greater customization of the category widget.
