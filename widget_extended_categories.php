@@ -42,7 +42,9 @@ function widget_extended_categories_init() {
 		$style = empty( $options['style'] ) ? 'list' : $options['style'];
 		$cat_args = array ('orderby'=>$s, 'order'=>$o, 'show_count'=>$c, 'hide_empty'=>$e, 'hierarchical'=>$h, 'title_li'=>'', 'show_option_none'=>__( 'Select Category' ));
 		
+		
 		echo $before_widget;
+		echo '<!-- AVH Extended Categories | http://blog.avirtualhome.com/wordpress-plugins/ -->'
 		echo $before_title . $title . $after_title;
 		?>
 <ul>
