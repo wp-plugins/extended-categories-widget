@@ -44,7 +44,7 @@ function widget_extended_categories_init() {
 		
 		
 		echo $before_widget;
-		echo '<!-- AVH Extended Categories | http://blog.avirtualhome.com/wordpress-plugins/ -->'
+		echo '<!-- AVH Extended Categories | http://blog.avirtualhome.com/wordpress-plugins/ -->';
 		echo $before_title . $title . $after_title;
 		?>
 <ul>
