@@ -3,7 +3,7 @@
 Plugin Name: Extended Category Widget
 Plugin URI: http://blog.avirtualhome.com/wordpress-plugins
 Description: Replacement of the category widget to allow for greater customization of the category widget.
-Version: 1.2
+Version: 1.3
 Author: Peter van der Does
 Author URI: http://blog.avirtualhome.com/
 
@@ -26,40 +26,52 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 function widget_extended_categories_init() {
 	// Widgets exists?
-	if ( ! function_exists( 'wp_register_sidebar_widget' ) || ! function_exists( 'wp_register_widget_control' ) ) {
+	if (! function_exists ( 'wp_register_sidebar_widget' ) || ! function_exists ( 'wp_register_widget_control' )) {
 		return;
 	}
-
+	
 	function widget_extended_categories($args) {
-		extract( $args );
-		$options = get_option( 'widget_extended_categories' );
-		$c = $options['count'] ? '1' : '0';
-		$h = $options['hierarchical'] ? '1' : '0';
-		$e = $options['hide_empty'] ? '1' : '0';
-		$s = $options['sort_column'] ? $options['sort_column'] : 'name';
-		$o = $options['sort_order'] ? $options['sort_order'] : 'asc';
-		$title = empty( $options['title'] ) ? __( 'Categories' ) : $options['title'];
-		$style = empty( $options['style'] ) ? 'list' : $options['style'];
-		$cat_args = array ('orderby'=>$s, 'order'=>$o, 'show_count'=>$c, 'hide_empty'=>$e, 'hierarchical'=>$h, 'title_li'=>'', 'show_option_none'=>__( 'Select Category' ));
-		
-		
+		// Check for version
+		global $wp_version;
+		if ( version_compare($wp_version, '2.5.1', '<') ) {
+    		$avh_extcat_canselectcats=false;
+    	} else {
+    		$avh_extcat_canselectcats=true;
+    	}
+		extract ( $args );
+		$options = get_option ( 'widget_extended_categories' );
+		$c = $options ['count'] ? '1' : '0';
+		$h = $options ['hierarchical'] ? '1' : '0';
+		$e = $options ['hide_empty'] ? '1' : '0';
+		$s = $options ['sort_column'] ? $options ['sort_column'] : 'name';
+		$o = $options ['sort_order'] ? $options ['sort_order'] : 'asc';
+		$title = empty ( $options ['title'] ) ? __ ( 'Categories' ) : $options ['title'];
+		$style = empty ( $options ['style'] ) ? 'list' : $options ['style'];
+		if ($avh_extcat_canselectcats) {
+			if ($options ['post_category']) {
+				$post_category = unserialize ( $options ['post_category'] );
+				$included_cats = implode ( ",", $post_category );
+			}
+			$cat_args = array ('include' => $included_cats, 'orderby' => $s, 'order' => $o, 'show_count' => $c, 'hide_empty' => $e, 'hierarchical' => $h, 'title_li' => '', 'show_option_none' => __ ( 'Select Category' ) );
+		} else {
+			$cat_args = array ('orderby' => $s, 'order' => $o, 'show_count' => $c, 'hide_empty' => $e, 'hierarchical' => $h, 'title_li' => '', 'show_option_none' => __ ( 'Select Category' ) );
+		}
 		echo $before_widget;
 		echo '<!-- AVH Extended Categories | http://blog.avirtualhome.com/wordpress-plugins/ -->';
 		echo $before_title . $title . $after_title;
-		?>
-<ul>
-<?php
-		if ( $style == 'list' ) {
-			wp_list_categories( $cat_args );
+		echo '<ul>';
+		
+		if ($style == 'list') {
+			wp_list_categories ( $cat_args );
 		} else {
-			wp_dropdown_categories( $cat_args );
-			?> 
-                        <script lang='javascript'><!--
+			wp_dropdown_categories ( $cat_args );
+			?>
+<script lang='javascript'><!--
                         var dropdown = document.getElementById("cat");
                         function onCatChange() {
                             if ( dropdown.options[dropdown.selectedIndex].value > 0 ) {
                                 location.href = "<?php
-			echo get_option( 'home' );
+			echo get_option ( 'home' );
 			?>/?cat="+dropdown.options[dropdown.selectedIndex].value;
                             }
                         }
@@ -67,59 +79,70 @@ function widget_extended_categories_init() {
 --></script>
 <?php
 		}
-		?>
-                </ul>
-<?php
+		echo '</ul>';
 		echo $after_widget;
 	}
-
+	
 	function widget_extended_categories_control() {
+	// Check for version
+		global $wp_version;
+		if ( version_compare($wp_version, '2.5.1', '<') ) {
+    		$avh_extcat_canselectcats=false;
+    	} else {
+    		$avh_extcat_canselectcats=true;
+    	}
 		// Get actual options
-		$options = $newoptions = get_option( 'widget_extended_categories' );
-		if ( ! is_array( $options ) ) {
-			$options = $newoptions = array ();
+		$options = $newoptions = get_option ( 'widget_extended_categories' );
+		if (! is_array ( $options )) {
+			$options = $newoptions = array ( );
 		}
 		
 		// Post to new options array
-		if ( $_POST['categories-submit'] ) {
-			$newoptions['title'] = strip_tags( stripslashes( $_POST['categories-title'] ) );
-			$newoptions['count'] = isset( $_POST['categories-count'] );
-			$newoptions['hierarchical'] = isset( $_POST['categories-hierarchical'] );
-			$newoptions['hide_empty'] = isset( $_POST['categories-hide_empty'] );
-			$newoptions['sort_column'] = strip_tags( stripslashes( $_POST['categories-sort_column'] ) );
-			$newoptions['sort_order'] = strip_tags( stripslashes( $_POST['categories-sort_order'] ) );
-			$newoptions['style'] = strip_tags( stripslashes( $_POST['categories-style'] ) );
+		if ($_POST ['categories-submit']) {
+			$newoptions ['title'] = strip_tags ( stripslashes ( $_POST ['categories-title'] ) );
+			$newoptions ['count'] = isset ( $_POST ['categories-count'] );
+			$newoptions ['hierarchical'] = isset ( $_POST ['categories-hierarchical'] );
+			$newoptions ['hide_empty'] = isset ( $_POST ['categories-hide_empty'] );
+			$newoptions ['sort_column'] = strip_tags ( stripslashes ( $_POST ['categories-sort_column'] ) );
+			$newoptions ['sort_order'] = strip_tags ( stripslashes ( $_POST ['categories-sort_order'] ) );
+			$newoptions ['style'] = strip_tags ( stripslashes ( $_POST ['categories-style'] ) );
+			if ($avh_extcat_canselectcats) {
+				if (in_array ( '-1', $_POST ['post_category'], true )) {
+					$newoptions ['post_category'] = false;
+				} else {
+					$newoptions ['post_category'] = serialize ( $_POST ['post_category'] );
+				}
+			}
+		
 		}
 		
 		// Update if new options
-		if ( $options != $newoptions ) {
+		if ($options != $newoptions) {
 			$options = $newoptions;
-			update_option( 'widget_extended_categories', $options );
+			update_option ( 'widget_extended_categories', $options );
 		}
 		
 		// Prepare data for display
-		$title = htmlspecialchars( $options['title'], ENT_QUOTES );
-		$count = $options['count'] ? 'checked="checked"' : '';
-		$hierarchical = $options['hierarchical'] ? 'checked="checked"' : '';
-		$hide_empty = $options['hide_empty'] ? 'checked="checked"' : '';
-		$sort_id = ($options['sort_column'] == 'ID') ? ' SELECTED' : '';
-		$sort_name = ($options['sort_column'] == 'name') ? ' SELECTED' : '';
-		$sort_count = ($options['sort_column'] == 'count') ? ' SELECTED' : '';
-		$sort_order_a = ($options['sort_order'] == 'asc') ? ' SELECTED' : '';
-		$sort_order_d = ($options['sort_order'] == 'desc') ? ' SELECTED' : '';
-		$style_list = ($options['style'] == 'list') ? ' SELECTED' : '';
-		$style_drop = ($options['style'] == 'drop') ? ' SELECTED' : '';
+		$title = htmlspecialchars ( $options ['title'], ENT_QUOTES );
+		$count = $options ['count'] ? 'checked="checked"' : '';
+		$hierarchical = $options ['hierarchical'] ? 'checked="checked"' : '';
+		$hide_empty = $options ['hide_empty'] ? 'checked="checked"' : '';
+		$sort_id = ($options ['sort_column'] == 'ID') ? ' SELECTED' : '';
+		$sort_name = ($options ['sort_column'] == 'name') ? ' SELECTED' : '';
+		$sort_count = ($options ['sort_column'] == 'count') ? ' SELECTED' : '';
+		$sort_order_a = ($options ['sort_order'] == 'asc') ? ' SELECTED' : '';
+		$sort_order_d = ($options ['sort_order'] == 'desc') ? ' SELECTED' : '';
+		$style_list = ($options ['style'] == 'list') ? ' SELECTED' : '';
+		$style_drop = ($options ['style'] == 'drop') ? ' SELECTED' : '';
+		if ($avh_extcat_canselectcats) {
+			$selected_cats = ($options ['post_category'] != '') ? unserialize ( $options ['post_category'] ) : false;
+		}
 		?>
-<div><label for="categories-title"><?php
-		_e( 'Title:' );
-		?>
-                <input style="width: 250px;" id="categories-title"
-	name="categories-title" type="text" value="<?php
-		echo $title;
-		?>" /> </label> <label for="categories-count"
-	style="line-height: 35px; display: block;">Show post counts <input
-	class="checkbox" type="checkbox" <?php
-		echo $count;
+<div>
+<label for="categories-title"><?php _e ( 'Title:' ); ?>
+	<input style="width: 250px;" id="categories-title"	name="categories-title" type="text" value="<?php echo $title; ?>" />
+</label>
+<label for="categories-count" style="line-height: 35px; display: block;">Show post counts <input class="checkbox" type="checkbox" <?php echo $count;
 		?>
 	id="categories-count" name="categories-count" /> </label> <label
 	for="categories-hierarchical"
@@ -159,18 +182,35 @@ by <select id="categories-sort_column" name="categories-sort_column">
 	<option value='drop' <?php
 		echo $style_drop;
 		?>>Drop down</option>
-</select> </label> <input type="hidden" id="categories-submit"
-	name="categories-submit" value="1" /></div>
+</select> </label> 
+<?php 
+if ($avh_extcat_canselectcats) { 
+	echo '			<b>Include these categories</b><hr />';	
+	echo '			<ul id="categorychecklist" class="list:category categorychecklist form-no-clear" style="list-style-type: none; margin-left: 5px; padding-left: 0px; margin-bottom: 20px;">';
+	echo '				<li id="category--1" class="popular-category">';
+	echo '					<label for="in-category--1" class="selectit">';
+	echo '						<input value="-1" name="post_category[]" id="in-category--1" type="checkbox"'; 
+	if (!$selected_cats) { echo 'checked'; }
+	echo '> Include All Categories';
+	echo '					</label>';
+	echo '				</li>';
+	wp_category_checklist(0,0,$selected_cats);
+	echo '			</ul>';
+}
+?>
+	
+	<input type="hidden" id="categories-submit" name="categories-submit"
+	value="1" /></div>
 <?php
 	}
-
+	
 	function widget_extended_categories_register() {
-		wp_register_sidebar_widget( 'extended-categories', 'Extended Categories', 'widget_extended_categories' );
-		wp_register_widget_control( 'extended-categories', 'Extended Categories', 'widget_extended_categories_control', array ('width'=>300, 'height'=>245) );
+		wp_register_sidebar_widget ( 'extended-categories', 'Extended Categories', 'widget_extended_categories' );
+		wp_register_widget_control ( 'extended-categories', 'Extended Categories', 'widget_extended_categories_control', array ('width' => 300, 'height' => 245 ) );
 	}
 	
 	// Launch Widgets
-	widget_extended_categories_register();
+	widget_extended_categories_register ();
 }
-add_action( 'plugins_loaded', 'widget_extended_categories_init' );
+add_action ( 'plugins_loaded', 'widget_extended_categories_init' );
 ?>
