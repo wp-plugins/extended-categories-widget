@@ -4,7 +4,7 @@ Donate link: http://blog.avirtualhome.com/wordpress-plugins/
 Tags: extended, categories, widget
 Requires at least: 2.3
 Tested up to: 2.5.1
-Stable tag: 1.2
+Stable tag: 1.3
 
 Replacement of the category widget to allow for greater customization of the category widget.
 
