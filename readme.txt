@@ -24,7 +24,7 @@ Replacement of the category widget to allow for greater customization of the cat
 
 The Extended Categories Widget can be installed in 3 easy steps:
 
-1. Unzip "Extended Categories" archive and put the directory "extended-categories" into your "plugins" folder (wp-content/plugins/).
+1. Unzip  the extended-categories-widget archive and put the directory "extended-categories-widget" into your "plugins" folder (wp-content/plugins/).
 
 1. Activate the plugin
 
