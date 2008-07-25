@@ -4,7 +4,7 @@ Donate link: http://blog.avirtualhome.com/wordpress-plugins/
 Tags: extended, categories, widget
 Requires at least: 2.3
 Tested up to: 2.6
-Stable tag: 1.3
+Stable tag: 1.4
 
 Replacement of the category widget to allow for greater customization of the category widget.
 
@@ -40,6 +40,8 @@ I created a support site at http://forums.avirtualhome.com where you can ask que
 None
 
 == Arbitrary section ==
+* Version 1.4
+	* Ability to have up to 9 widgets.
 * Version 1.3
 	* You can select which categories to show (Requires WordPress 2.5.1 or higher).
 * Version 1.2
