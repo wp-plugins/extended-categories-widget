@@ -31,6 +31,7 @@ function widget_extended_categories_init() {
 	}
 	
 	function widget_extended_categories($args, $number = 1) {
+		$version = '1.4';
 		// Check for version
 		global $wp_version;
 		if ( version_compare($wp_version, '2.5.1', '<') ) {
@@ -57,7 +58,7 @@ function widget_extended_categories_init() {
 			$cat_args = array ('orderby' => $s, 'order' => $o, 'show_count' => $c, 'hide_empty' => $e, 'hierarchical' => $h, 'title_li' => '', 'show_option_none' => __ ( 'Select Category' ) );
 		}
 		echo $before_widget;
-		echo '<!-- AVH Extended Categories | http://blog.avirtualhome.com/wordpress-plugins/ -->';
+		echo '<!-- AVH Extended Categories version ' . $version .' | http://blog.avirtualhome.com/wordpress-plugins/ -->';
 		echo $before_title . $title . $after_title;
 		echo '<ul>';
 		
