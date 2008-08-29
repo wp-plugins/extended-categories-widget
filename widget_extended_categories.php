@@ -3,7 +3,7 @@
 Plugin Name: Extended Category Widget
 Plugin URI: http://blog.avirtualhome.com/wordpress-plugins
 Description: Replacement of the category widget to allow for greater customization of the category widget.
-Version: 1.4
+Version: 1.4.1
 Author: Peter van der Does
 Author URI: http://blog.avirtualhome.com/
 
@@ -31,7 +31,7 @@ function widget_extended_categories_init() {
 	}
 	
 	function widget_extended_categories($args, $number = 1) {
-		$version = '1.4';
+		$version = '1.4.1';
 		// Check for version
 		global $wp_version;
 		if ( version_compare($wp_version, '2.5.1', '<') ) {
@@ -53,9 +53,9 @@ function widget_extended_categories_init() {
 				$post_category = unserialize ( $options [$number]['post_category'] );
 				$included_cats = implode ( ",", $post_category );
 			}
-			$cat_args = array ('include' => $included_cats, 'orderby' => $s, 'order' => $o, 'show_count' => $c, 'hide_empty' => $e, 'hierarchical' => $h, 'title_li' => '', 'show_option_none' => __ ( 'Select Category' ) );
+			$cat_args = array ('include' => $included_cats, 'orderby' => $s, 'order' => $o, 'show_count' => $c, 'hide_empty' => $e, 'hierarchical' => $h, 'title_li' => '', 'show_option_none' => __ ( 'Select Category' ), 'name' =>  'ec-cat-'.$number );
 		} else {
-			$cat_args = array ('orderby' => $s, 'order' => $o, 'show_count' => $c, 'hide_empty' => $e, 'hierarchical' => $h, 'title_li' => '', 'show_option_none' => __ ( 'Select Category' ) );
+			$cat_args = array ('orderby' => $s, 'order' => $o, 'show_count' => $c, 'hide_empty' => $e, 'hierarchical' => $h, 'title_li' => '', 'show_option_none' => __ ( 'Select Category' ), 'name' =>  'ec-cat-'.$number);
 		}
 		echo $before_widget;
 		echo '<!-- AVH Extended Categories version ' . $version .' | http://blog.avirtualhome.com/wordpress-plugins/ -->';
@@ -68,15 +68,13 @@ function widget_extended_categories_init() {
 			wp_dropdown_categories ( $cat_args );
 			?>
 <script lang='javascript'><!--
-                        var dropdown = document.getElementById("cat");
-                        function onCatChange() {
-                            if ( dropdown.options[dropdown.selectedIndex].value > 0 ) {
-                                location.href = "<?php
-			echo get_option ( 'home' );
-			?>/?cat="+dropdown.options[dropdown.selectedIndex].value;
+                        var ec_dropdown_<?php echo ($number); ?> = document.getElementById('ec-cat-<?php echo ($number); ?>');
+                        function ec_onCatChange_<?php echo ($number); ?>() {
+                            if ( ec_dropdown_<?php echo ($number); ?>.options[ec_dropdown_<?php echo ($number); ?>.selectedIndex].value > 0 ) {
+                                location.href = "<?php echo get_option ( 'home' ); ?>/?cat="+ec_dropdown_<?php echo ($number); ?>.options[ec_dropdown_<?php echo ($number); ?>.selectedIndex].value;
                             }
                         }
-                        dropdown.onchange = onCatChange;
+                        ec_dropdown_<?php echo ($number); ?>.onchange = ec_onCatChange_<?php echo ($number); ?>;
 --></script>
 <?php
 		}
