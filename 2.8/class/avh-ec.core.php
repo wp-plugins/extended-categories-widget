@@ -1,5 +1,5 @@
 <?php
-class AVHExtendendCategoriesCore
+class AVHExtendedCategoriesCore
 {
 	var $version;
 	var $comment;
@@ -10,16 +10,16 @@ class AVHExtendendCategoriesCore
 	 */
 	function __construct ()
 	{
-		$this->version = '2.0.1';
+		$this->version = '2.0.2';
 		$this->comment = '<!-- AVH Extended Categories version ' . $this->version . ' | http://blog.avirtualhome.com/wordpress-plugins/ -->';
 	}
 
 	/**
 	 * PHP4 Constructor
 	 *
-	 * @return AVHExtendendCategoriesCore
+	 * @return AVHExtendedCategoriesCore
 	 */
-	function AVHExtendendCategoriesCore ()
+	function AVHExtendedCategoriesCore ()
 	{
 		$this->__construct();
 	}
@@ -33,7 +33,7 @@ class AVHExtendendCategoriesCore
 	{
 		static $_instance;
 		if ( $_instance === null ) {
-			$_instance = & new AVHExtendendCategoriesCore( );
+			$_instance = & new AVHExtendedCategoriesCore( );
 		}
 		return $_instance;
 	}
