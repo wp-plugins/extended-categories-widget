@@ -3,6 +3,7 @@ class AVHExtendedCategoriesCore
 {
 	var $version;
 	var $comment;
+	var $info;
 
 	/**
 	 * PHP5 constructor
@@ -10,8 +11,29 @@ class AVHExtendedCategoriesCore
 	 */
 	function __construct ()
 	{
-		$this->version = '2.1';
+		$this->version = '2.2';
 		$this->comment = '<!-- AVH Extended Categories version ' . $this->version . ' | http://blog.avirtualhome.com/wordpress-plugins/ -->';
+
+		// Determine installation path & url
+		$path = str_replace( '\\', '/', dirname( __FILE__ ) );
+		$path = substr( $path, strpos( $path, 'plugins' ) + 8, strlen( $path ) );
+		$path = substr( $path, 0, strlen( $path ) - 6 );
+
+		$info['siteurl'] = get_option( 'siteurl' );
+
+		$info['plugin_url'] = WP_PLUGIN_URL;
+		$info['plugin_dir'] = WP_PLUGIN_DIR;
+
+		if ( $path != 'plugins' ) {
+			$info['plugin_url'] .= '/' . $path;
+			$info['plugin_dir'] .= '/' . $path;
+		}
+
+		$info['lang_dir'] = $path . '/lang';
+		// Set class property for info
+		$this->info = array ('home' => get_option( 'home' ), 'siteurl' => $info['siteurl'], 'plugin_url' => $info['plugin_url'], 'plugin_dir' => $info['plugin_dir'], 'lang_dir' => $info['lang_dir'] );
+
+		$this->handleTextdomain();
 	}
 
 	/**
@@ -39,6 +61,18 @@ class AVHExtendedCategoriesCore
 	}
 
 	/**
+	 * Loads the i18n
+	 *
+	 * @return
+	 */
+	function handleTextdomain ()
+	{
+
+		load_plugin_textdomain( 'avh-ec', false, $this->info['lang_dir'] );
+
+	}
+
+	/**
 	 * Used in forms to set the checked option.
 	 *
 	 * @param mixed $checked
@@ -54,5 +88,25 @@ class AVHExtendedCategoriesCore
 		}
 		return ('');
 	}
+
+		/**
+	 * Get the base directory of a directory structure
+	 *
+	 * @param string $directory
+	 * @return string
+	 *
+	 */
+	function getBaseDirectory ( $directory )
+	{
+		//get public directory structure eg "/top/second/third"
+		$public_directory = dirname( $directory );
+		//place each directory into array
+		$directory_array = explode( '/', $public_directory );
+		//get highest or top level in array of directory strings
+		$public_base = max( $directory_array );
+
+		return $public_base;
+	}
+
 }
 ?>
