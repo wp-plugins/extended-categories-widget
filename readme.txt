@@ -4,10 +4,9 @@ Donate link: http://blog.avirtualhome.com/wordpress-plugins/
 Tags: extended, categories, widget, top categories
 Requires at least: 2.3
 Tested up to: 2.8
-Stable tag: 2.2
+Stable tag: 2.3
 
-The AVH Extended Categories Widget gives you two widgets for displaying categories. One is a replacement of the default category widget to allow for greater customization. The second is a Top Categories widget.
-
+The AVH Extended Categories Widget gives you two widgets for displaying categories.
 == Description ==
 
 The AVH Extended Categories Widget gives you two widgets for displaying categories.
@@ -40,6 +39,9 @@ The Top Categories widget gives you the following customizable options:
 * Show RSS link after the category as text or image.
 * Select which categories to show. (Requires WordPress 2.5.1 or higher).
 
+Translations:
+* Czech (cs_CZ) by Dirty Mind - http://dirtymind.ic.cz
+
 == Installation ==
 
 The Extended Categories Widget can be installed in 3 easy steps:
@@ -71,6 +73,12 @@ I'll keep a list of translators and their websites here in the readme.txt and on
 None
 
 == Changelog ==
+= Version 2.3 = 
+* RFC: You can change the text Select Category, without editing any translation file.
+* Bugfix: Selecting one parent wouldn;t show it's children.
+* You can now display only selected categories. This didn't work properly in an hierachical category structure.
+* Added Czech translation.
+
 = Version 2.2 =
 * RFC: Internationalization of the plugin.
 * Bugfix: W3 Validation Errors when using dropdown categories.
