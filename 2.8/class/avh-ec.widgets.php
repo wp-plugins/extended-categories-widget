@@ -5,6 +5,10 @@
  */
 class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 {
+	/**
+	 *
+	 * @var AVH_EC_Core
+	 */
 	var $core;
 
 	/**
@@ -13,16 +17,18 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 	 */
 	function __construct ()
 	{
-		$this->core = & AVHExtendedCategoriesCore::getInstance();
+		$this->core = & AVH_EC_Singleton::getInstance( 'AVH_EC_Core' );
 
 		//Convert the old option widget_extended_categories to widget_extended-categories
 		$old = get_option( 'widget_extended_categories' );
-		if ( ! (false === $old) ) {
+		if ( ! (FALSE === $old) ) {
 			update_option( 'widget_extended-categories', $old );
 			delete_option( 'widget_extended_categories' );
 		}
 		$widget_ops = array ('description' => __( "An extended version of the default Categories widget.", 'avh-ec' ) );
-		WP_Widget::__construct( 'extended-categories', __('AVH Extended Categories'), $widget_ops );
+		WP_Widget::__construct( 'extended-categories', __( 'AVH Extended Categories' ), $widget_ops );
+
+		wp_enqueue_style( 'avhec-widget-css' );
 	}
 
 	function WP_Widget_AVH_ExtendedCategories_Normal ()
@@ -40,16 +46,17 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 	{
 		extract( $args );
 
-		$selectedonly = $instance['selectedonly'] ? '1' : '0';
-		$c = $instance['count'] ? '1' : '0';
-		$h = $instance['hierarchical'] ? '1' : '0';
+		$selectedonly = $instance['selectedonly'] ? TRUE : FALSE;
+		$c = $instance['count'] ? TRUE : FALSE;
+		$h = $instance['hierarchical'] ? TRUE : FALSE;
 		$d = $instance['depth'] ? $instance['depth'] : 0;
-		$e = $instance['hide_empty'] ? '1' : '0';
+		$e = $instance['hide_empty'] ? TRUE : FALSE;
+		$use_desc_for_title = $instance['use_desc_for_title'] ? TRUE : FALSE;
 		$s = $instance['sort_column'] ? $instance['sort_column'] : 'name';
 		$o = $instance['sort_order'] ? $instance['sort_order'] : 'asc';
 		$r = $instance['rssfeed'] ? 'RSS' : '';
 		$i = $instance['rssimage'] ? $instance['rssimage'] : '';
-		$invert = $instance['invert_included'] ? '1' : '0';
+		$invert = $instance['invert_included'] ? TRUE : FALSE;
 
 		if ( empty( $r ) ) {
 			$i = '';
@@ -82,11 +89,11 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 
 		$options = $this->core->getOptions();
 		$show_option_none = __( 'Select Category', 'avh-ec' );
-		if ( $options['general']['selectcategory'] ) {
-			$show_option_none = $options['general']['selectcategory'];
+		if ( $options['general']['alternative_name_select_category'] ) {
+			$show_option_none = $options['general']['alternative_name_select_category'];
 		}
 
-		$cat_args = array ($inc_exc => $included_cats, 'orderby' => $s, 'order' => $o, 'show_count' => $c, 'hide_empty' => $e, 'hierarchical' => $h, 'depth' => $d, 'title_li' => '', 'show_option_none' => $show_option_none, 'feed' => $r, 'feed_image' => $i, 'name' => 'extended-categories-select-' . $this->number );
+		$cat_args = array ($inc_exc => $included_cats, 'orderby' => $s, 'order' => $o, 'show_count' => $c, 'use_desc_for_title' => $use_desc_for_title, 'hide_empty' => $e, 'hierarchical' => $h, 'depth' => $d, 'title_li' => '', 'show_option_none' => $show_option_none, 'feed' => $r, 'feed_image' => $i, 'name' => 'extended-categories-select-' . $this->number );
 		echo $before_widget;
 		echo $this->core->comment;
 		echo $before_title . $title . $after_title;
@@ -123,23 +130,24 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 	{
 		// update the instance's settings
 		if ( ! isset( $new_instance['submit'] ) ) {
-			return false;
+			return FALSE;
 		}
 
 		$instance = $old_instance;
 
 		$instance['title'] = strip_tags( stripslashes( $new_instance['title'] ) );
-		$instance['selectedonly'] = $new_instance['selectedonly'] ? 1 : 0;
-		$instance['count'] = $new_instance['count'] ? 1 : 0;
-		$instance['hierarchical'] = $new_instance['hierarchical'] ? 1 : 0;
-		$instance['hide_empty'] = $new_instance['hide_empty'] ? 1 : 0;
+		$instance['selectedonly'] = $new_instance['selectedonly'] ? TRUE : FALSE;
+		$instance['count'] = $new_instance['count'] ? TRUE : FALSE;
+		$instance['hierarchical'] = $new_instance['hierarchical'] ? TRUE : FALSE;
+		$instance['hide_empty'] = $new_instance['hide_empty'] ? TRUE : FALSE;
+		$instance['use_desc_for_title'] = $new_instance['use_desc_for_title'] ? TRUE : FALSE;
 		$instance['sort_column'] = strip_tags( stripslashes( $new_instance['sort_column'] ) );
 		$instance['sort_order'] = strip_tags( stripslashes( $new_instance['sort_order'] ) );
 		$instance['style'] = strip_tags( stripslashes( $new_instance['style'] ) );
-		$instance['rssfeed'] = $new_instance['rssfeed'] ? 1 : 0;
+		$instance['rssfeed'] = $new_instance['rssfeed'] ? TRUE : FALSE;
 		$instance['rssimage'] = strip_tags( stripslashes( $new_instance['rssimage'] ) );
 		if ( array_key_exists( 'all', $new_instance['post_category'] ) ) {
-			$instance['post_category'] = false;
+			$instance['post_category'] = FALSE;
 		} else {
 			$instance['post_category'] = serialize( $new_instance['post_category'] );
 		}
@@ -147,11 +155,11 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 		if ( $instance['depth'] < 0 || 11 < $instance['depth'] ) {
 			$instance['depth'] = 0;
 		}
-		$instance['invert_included'] = $new_instance['invert_included'] ? 1 : 0;
+		$instance['invert_included'] = $new_instance['invert_included'] ? TRUE : FALSE;
 
 		// If only the selected categories are to be displayed, this implies a flat view. Can't be hierarchical
-		if ( 1 == $new_instance['selectedonly'] ) {
-			$instance['hierarchical'] = 0;
+		if ( TRUE == $new_instance['selectedonly'] ) {
+			$instance['hierarchical'] = FALSE;
 		}
 		return $instance;
 	}
@@ -173,6 +181,7 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 		$hierarchical = ( bool ) $instance['hierarchical'];
 		$depth = ( int ) $instance['depth'];
 		$hide_empty = ( bool ) $instance['hide_empty'];
+		$use_desc_for_title = ( bool ) $instance['use_desc_for_title'];
 		$sort_id = ($instance['sort_column'] == 'ID') ? ' SELECTED' : '';
 		$sort_name = ($instance['sort_column'] == 'name') ? ' SELECTED' : '';
 		$sort_count = ($instance['sort_column'] == 'count') ? ' SELECTED' : '';
@@ -182,15 +191,15 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 		$style_drop = ($instance['style'] == 'drop') ? ' SELECTED' : '';
 		$rssfeed = ( bool ) $instance['rssfeed'];
 		$rssimage = esc_attr( $instance['rssimage'] );
-		$selected_cats = ($instance['post_category'] != '') ? unserialize( $instance['post_category'] ) : false;
+		$selected_cats = ($instance['post_category'] != '') ? unserialize( $instance['post_category'] ) : FALSE;
 		$invert_included = ( bool ) $instance['invert_included'];
 
 		if ( $depth < 0 || 11 < $depth ) {
 			$depth = 0;
 		}
 
-		if (1 == $selectedonly) {
-			$hierarchical = 0;
+		if ( TRUE == $selectedonly ) {
+			$hierarchical = FALSE;
 		}
 		echo '<p>';
 		echo '<label for="' . $this->get_field_id( 'title' ) . '">';
@@ -202,19 +211,19 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 		echo '<p>';
 
 		echo '<label for="' . $this->get_field_id( 'selectedonly' ) . '">';
-		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'selectedonly' ) . '"	name="' . $this->get_field_name( 'selectedonly' ) . '" ' . $this->core->isChecked( true, $selectedonly ) . ' /> ';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'selectedonly' ) . '"	name="' . $this->get_field_name( 'selectedonly' ) . '" ' . $this->core->isChecked( TRUE, $selectedonly ) . ' /> ';
 		_e( 'Show selected categories only', 'avh-ec' );
 		echo '</label>';
 		echo '<br />';
 
 		echo '<label for="' . $this->get_field_id( 'count' ) . '">';
-		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'count' ) . '"	name="' . $this->get_field_name( 'count' ) . '" ' . $this->core->isChecked( true, $count ) . ' /> ';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'count' ) . '"	name="' . $this->get_field_name( 'count' ) . '" ' . $this->core->isChecked( TRUE, $count ) . ' /> ';
 		_e( 'Show post counts', 'avh-ec' );
 		echo '</label>';
 		echo '<br />';
 
-		echo '<label for="' . $this->get_field_id( 'hierachical' ) . '">';
-		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'hierachical' ) . '" name="' . $this->get_field_name( 'hierarchical' ) . '" ' . $this->core->isChecked( true, $hierarchical ) . ' /> ';
+		echo '<label for="' . $this->get_field_id( 'hierarchical' ) . '">';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'hierarchical' ) . '" name="' . $this->get_field_name( 'hierarchical' ) . '" ' . $this->core->isChecked( TRUE, $hierarchical ) . ' /> ';
 		_e( 'Show hierarchy', 'avh-ec' );
 		echo '</label>';
 		echo '<br />';
@@ -232,8 +241,14 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 		echo '<br />';
 
 		echo '<label for="' . $this->get_field_id( 'hide_empty' ) . '">';
-		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'hide_empty' ) . '"	name="' . $this->get_field_name( 'hide_empty' ) . '" ' . $this->core->isChecked( true, $hide_empty ) . '/> ';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'hide_empty' ) . '"	name="' . $this->get_field_name( 'hide_empty' ) . '" ' . $this->core->isChecked( TRUE, $hide_empty ) . '/> ';
 		_e( 'Hide empty categories', 'avh-ec' );
+		echo '</label>';
+		echo '<br />';
+
+		echo '<label for="' . $this->get_field_id( 'use_desc_for_title' ) . '">';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'use_desc_for_title' ) . '"	name="' . $this->get_field_name( 'use_desc_for_title' ) . '" ' . $this->core->isChecked( TRUE, $use_desc_for_title ) . '/> ';
+		_e( 'Use description for title', 'avh-ec' );
 		echo '</label>';
 		echo '<br />';
 		echo '</p>';
@@ -271,7 +286,7 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 		echo '<p>';
 
 		echo '<label for="' . $this->get_field_id( 'rssfeed' ) . '">';
-		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'rssfeed' ) . '" name="' . $this->get_field_name( 'rssfeed' ) . '" ' . $this->core->isChecked( true, $rssfeed ) . '/> ';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'rssfeed' ) . '" name="' . $this->get_field_name( 'rssfeed' ) . '" ' . $this->core->isChecked( TRUE, $rssfeed ) . '/> ';
 		_e( 'Show RSS Feed', 'avh-ec' );
 		echo '</label>';
 		echo '<br />';
@@ -287,17 +302,17 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 		echo '<ul id="categorychecklist" class="list:category categorychecklist form-no-clear" style="list-style-type: none; margin-left: 5px; padding-left: 0px; margin-bottom: 20px;">';
 		echo '<li id="' . $this->get_field_id( 'category--1' ) . '" class="popular-category">';
 		echo '<label for="' . $this->get_field_id( 'post_category' ) . '" class="selectit">';
-		echo '<input value="all" id="' . $this->get_field_id( 'post_category' ) . '" name="' . $this->get_field_name( 'post_category' ) . '[all]" type="checkbox" ' . $this->core->isChecked( false, $selected_cats ) . '> ';
+		echo '<input value="all" id="' . $this->get_field_id( 'post_category' ) . '" name="' . $this->get_field_name( 'post_category' ) . '[all]" type="checkbox" ' . $this->core->isChecked( FALSE, $selected_cats ) . '> ';
 		_e( 'All Categories', 'avh-ec' );
 		echo '</label>';
 		echo '</li>';
-		$this->avh_wp_category_checklist( 0, 0, $selected_cats, false, $this->number, 1 );
+		$this->avh_wp_category_checklist( 0, 0, $selected_cats, FALSE, $this->number, 1 );
 		echo '</ul>';
 		echo '</p>';
 
 		echo '<p>';
 		echo '<label for="' . $this->get_field_id( 'invert_included' ) . '">';
-		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'invert_included' ) . '"     name="' . $this->get_field_name( 'invert_included' ) . '" ' . $this->core->isChecked( true, $invert_included ) . '/> ';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'invert_included' ) . '"     name="' . $this->get_field_name( 'invert_included' ) . '" ' . $this->core->isChecked( TRUE, $invert_included ) . '/> ';
 		_e( 'Exclude the selected categories', 'avh-ec' );
 		echo '</label>';
 		echo '<br />';
@@ -315,7 +330,7 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 	 * @param array $popular_cats
 	 * @param int $number
 	 */
-	function avh_wp_category_checklist ( $post_id = 0, $descendants_and_self = 0, $selected_cats = false, $popular_cats = false, $number, $display = 1 )
+	function avh_wp_category_checklist ( $post_id = 0, $descendants_and_self = 0, $selected_cats = FALSE, $popular_cats = FALSE, $number, $display = 1 )
 	{
 		$walker = new AVH_Walker_Category_Checklist( );
 		$walker->number = $number;
@@ -336,7 +351,7 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 		if ( is_array( $popular_cats ) )
 			$args['popular_cats'] = $popular_cats;
 		else
-			$args['popular_cats'] = get_terms( 'category', array ('fields' => 'ids', 'orderby' => 'count', 'order' => 'DESC', 'number' => 10, 'hierarchical' => false ) );
+			$args['popular_cats'] = get_terms( 'category', array ('fields' => 'ids', 'orderby' => 'count', 'order' => 'DESC', 'number' => 10, 'hierarchical' => FALSE ) );
 
 		if ( $descendants_and_self ) {
 			$categories = get_categories( "child_of=$descendants_and_self&hierarchical=0&hide_empty=0" );
@@ -362,7 +377,7 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 			// Then the rest of them
 			echo call_user_func_array( array (&$walker, 'walk' ), array ($categories, 0, $args ) );
 		} else {
-			$return( $all_categories );
+			return ($all_categories);
 		}
 	}
 }
@@ -373,6 +388,10 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
  */
 class WP_Widget_AVH_ExtendedCategories_Top extends WP_Widget
 {
+	/**
+	 *
+	 * @var AVH_EC_Core
+	 */
 	var $core;
 
 	/**
@@ -381,10 +400,11 @@ class WP_Widget_AVH_ExtendedCategories_Top extends WP_Widget
 	 */
 	function __construct ()
 	{
-		$this->core = & AVHExtendedCategoriesCore::getInstance();
+		$this->core = & AVH_EC_Singleton::getInstance( 'AVH_EC_Core' );
+		wp_enqueue_style( 'avhec-widget-css' );
 
 		$widget_ops = array ('description' => __( "Shows the top categories.", 'avh-ec' ) );
-		WP_Widget::__construct( false, __( 'AVH Extended Categories Top' ), $widget_ops );
+		WP_Widget::__construct( FALSE, __( 'AVH Extended Categories: Top Categories' ), $widget_ops );
 	}
 
 	function WP_Widget_AVH_ExtendedCategories_Top ()
@@ -411,7 +431,8 @@ class WP_Widget_AVH_ExtendedCategories_Top extends WP_Widget
 		} elseif ( $a < 1 ) {
 			$a = 1;
 		}
-		$c = $instance['count'] ? '1' : '0';
+		$c = $instance['count'] ? TRUE : FALSE;
+		$use_desc_for_title = $instance['use_desc_for_title'] ? TRUE : FALSE;
 		$s = $instance['sort_column'] ? $instance['sort_column'] : 'name';
 		$o = $instance['sort_order'] ? $instance['sort_order'] : 'asc';
 		$r = $instance['rssfeed'] ? 'RSS' : '';
@@ -427,14 +448,14 @@ class WP_Widget_AVH_ExtendedCategories_Top extends WP_Widget
 
 		$options = $this->core->getOptions();
 		$show_option_none = __( 'Select Category', 'avh-ec' );
-		if ( $options['general']['selectcategory'] ) {
-			$show_option_none = $options['general']['selectcategory'];
+		if ( $options['general']['alternative_name_select_category'] ) {
+			$show_option_none = $options['general']['alternative_name_select_category'];
 		}
 
-		$top_cats = get_terms( 'category', array ('fields' => 'ids', 'orderby' => 'count', 'order' => 'DESC', 'number' => $a, 'hierarchical' => false ) );
+		$top_cats = get_terms( 'category', array ('fields' => 'ids', 'orderby' => 'count', 'order' => 'DESC', 'number' => $a, 'hierarchical' => FALSE ) );
 		$included_cats = implode( ",", $top_cats );
 
-		$cat_args = array ('include' => $included_cats, 'orderby' => $s, 'order' => $o, 'show_count' => $c, 'hide_empty' => 0, 'hierarchical' => 0, 'depth' => - 1, 'title_li' => '', 'show_option_none' => $show_option_none, 'feed' => $r, 'feed_image' => $i, 'name' => 'extended-categories-top-select-' . $this->number );
+		$cat_args = array ('include' => $included_cats, 'orderby' => $s, 'order' => $o, 'show_count' => $c, 'use_desc_for_title' => $use_desc_for_title, 'hide_empty' => FALSE, 'hierarchical' => FALSE, 'depth' => - 1, 'title_li' => '', 'show_option_none' => $show_option_none, 'feed' => $r, 'feed_image' => $i, 'name' => 'extended-categories-top-select-' . $this->number );
 		echo $before_widget;
 		echo $this->core->comment;
 		echo $before_title . $title . $after_title;
@@ -464,28 +485,29 @@ class WP_Widget_AVH_ExtendedCategories_Top extends WP_Widget
 	 *
 	 * This function should check that $new_instance is set correctly.
 	 * The newly calculated value of $instance should be returned.
-	 * If "false" is returned, the instance won't be saved/updated.
+	 * If "FALSE" is returned, the instance won't be saved/updated.
 	 *
 	 * @param array $new_instance New settings for this instance as input by the user via form()
 	 * @param array $old_instance Old settings for this instance
-	 * @return array Settings to save or bool false to cancel saving
+	 * @return array Settings to save or bool FALSE to cancel saving
 	 */
 	function update ( $new_instance, $old_instance )
 	{
 		// update the instance's settings
 		if ( ! isset( $new_instance['submit'] ) ) {
-			return false;
+			return FALSE;
 		}
 
 		$instance = $old_instance;
 
 		$instance['title'] = strip_tags( stripslashes( $new_instance['title'] ) );
 		$instance['amount'] = ( int ) $new_instance['amount'];
-		$instance['count'] = $new_instance['count'] ? 1 : 0;
+		$instance['count'] = $new_instance['count'] ? TRUE : FALSE;
+		$instance['use_desc_for_title'] = $new_instance['use_desc_for_title'] ? TRUE : FALSE;
 		$instance['sort_column'] = strip_tags( stripslashes( $new_instance['sort_column'] ) );
 		$instance['sort_order'] = strip_tags( stripslashes( $new_instance['sort_order'] ) );
 		$instance['style'] = strip_tags( stripslashes( $new_instance['style'] ) );
-		$instance['rssfeed'] = $new_instance['rssfeed'] ? 1 : 0;
+		$instance['rssfeed'] = $new_instance['rssfeed'] ? TRUE : FALSE;
 		$instance['rssimage'] = strip_tags( stripslashes( $new_instance['rssimage'] ) );
 
 		return $instance;
@@ -506,6 +528,7 @@ class WP_Widget_AVH_ExtendedCategories_Top extends WP_Widget
 			$amount = 5;
 		}
 		$count = ( bool ) $instance['count'];
+		$use_desc_for_title = ( bool ) $instance['use_desc_for_title'];
 		$sort_id = ($instance['sort_column'] == 'ID') ? ' SELECTED' : '';
 		$sort_name = ($instance['sort_column'] == 'name') ? ' SELECTED' : '';
 		$sort_count = ($instance['sort_column'] == 'count') ? ' SELECTED' : '';
@@ -536,8 +559,14 @@ class WP_Widget_AVH_ExtendedCategories_Top extends WP_Widget
 
 		echo '<p>';
 		echo '<label for="' . $this->get_field_id( 'count' ) . '">';
-		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'count' ) . '"	name="' . $this->get_field_name( 'count' ) . '" ' . $this->core->isChecked( true, $count ) . ' /> ';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'count' ) . '"	name="' . $this->get_field_name( 'count' ) . '" ' . $this->core->isChecked( TRUE, $count ) . ' /> ';
 		_e( 'Show post counts', 'avh-ec' );
+		echo '</label>';
+		echo '<br />';
+
+		echo '<label for="' . $this->get_field_id( 'use_desc_for_title' ) . '">';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'use_desc_for_title' ) . '"	name="' . $this->get_field_name( 'use_desc_for_title' ) . '" ' . $this->core->isChecked( TRUE, $use_desc_for_title ) . '/> ';
+		_e( 'Use description for title', 'avh-ec' );
 		echo '</label>';
 		echo '<br />';
 
@@ -573,7 +602,7 @@ class WP_Widget_AVH_ExtendedCategories_Top extends WP_Widget
 		echo '<p>';
 
 		echo '<label for="' . $this->get_field_id( 'rssfeed' ) . '">';
-		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'rssfeed' ) . '" name="' . $this->get_field_name( 'rssfeed' ) . '" ' . $this->core->isChecked( true, $rssfeed ) . '/> ';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'rssfeed' ) . '" name="' . $this->get_field_name( 'rssfeed' ) . '" ' . $this->core->isChecked( TRUE, $rssfeed ) . '/> ';
 		_e( 'Show RSS Feed', 'avh-ec' );
 		echo '</label>';
 		echo '<br />';
@@ -588,6 +617,254 @@ class WP_Widget_AVH_ExtendedCategories_Top extends WP_Widget
 	}
 
 }
+
+/**
+ * Widget Class for displaying the grouped categories
+ *
+ */
+class WP_Widget_AVH_ExtendedCategories_Category_Group extends WP_Widget
+{
+	/**
+	 *
+	 * @var AVH_EC_Core
+	 */
+	var $core;
+
+	/**
+	 * PHP 5 Constructor
+	 *
+	 */
+	function __construct ()
+	{
+		$this->core = & AVH_EC_Singleton::getInstance( 'AVH_EC_Core' );
+		wp_enqueue_style( 'avhec-widget-css' );
+
+		$widget_ops = array ('description' => __( "Shows grouped categories.", 'avh-ec' ) );
+		WP_Widget::__construct( FALSE, __( 'AVH Extended Category: Category Group' ), $widget_ops );
+	}
+
+	function WP_Widget_AVH_ExtendedCategories_Category_Group ()
+	{
+		$this->__construct();
+	}
+
+	/**
+	 * Display the widget
+	 *
+	 * @param unknown_type $args
+	 * @param unknown_type $instance
+	 */
+	function widget ( $args, $instance )
+	{
+		global $post;
+		$catgrp = new AVH_EC_Category_Group( );
+		extract( $args );
+
+		$c = $instance['count'] ? TRUE : FALSE;
+		$e = $instance['hide_empty'] ? TRUE : FALSE;
+		$use_desc_for_title = $instance['use_desc_for_title'] ? TRUE : FALSE;
+		$s = $instance['sort_column'] ? $instance['sort_column'] : 'name';
+		$o = $instance['sort_order'] ? $instance['sort_order'] : 'asc';
+		$r = $instance['rssfeed'] ? 'RSS' : '';
+		$i = $instance['rssimage'] ? $instance['rssimage'] : '';
+
+		if ( empty( $r ) ) {
+			$i = '';
+		}
+
+		$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Categories', 'avh-ec' ) : $instance['title'] );
+		$style = empty( $instance['style'] ) ? 'list' : $instance['style'];
+
+		$options = $this->core->getOptions();
+
+		$row = array ();
+		if ( is_home() ) {
+			$row = get_term_by( 'id', $options['cat_group']['home_group'], $catgrp->taxonomy_name ); // Returns FALSE when non-existance. (empty(FALSE)=TRUE)
+		} else {
+			$terms = wp_get_object_terms( $post->ID, $catgrp->taxonomy_name );
+			if ( ! empty( $terms ) ) {
+				$row = $terms[0];
+			}
+		}
+
+		if ( empty( $row ) ) { // There is no group associated with the post or the home group is empty
+			$options = $this->core->options;
+			$no_cat_group = $options['cat_group']['no_group'];
+			$row = get_term_by( 'id', $no_cat_group, $catgrp->taxonomy_name );
+		}
+
+		if ( ! ('none' == $row->name) ) {
+			$group_id = $row->term_id;
+			$cats = $catgrp->getCategoriesFromGroup( $group_id );
+			$included_cats = implode( ',', $cats );
+
+			$show_option_none = __( 'Select Category', 'avh-ec' );
+			if ( $options['general']['alternative_name_select_category'] ) {
+				$show_option_none = $options['general']['alternative_name_select_category'];
+			}
+
+			$cat_args = array ('include' => $included_cats, 'orderby' => $s, 'order' => $o, 'show_count' => $c, 'use_desc_for_title' => $use_desc_for_title, 'hide_empty' => $e, 'hierarchical' => FALSE, 'title_li' => '', 'show_option_none' => $show_option_none, 'feed' => $r, 'feed_image' => $i, 'name' => 'extended-categories-select-' . $this->number );
+			echo $before_widget;
+			echo $this->core->comment;
+			echo $before_title . $title . $after_title;
+
+			if ( $style == 'list' ) {
+				echo '<ul>';
+				$this->core->avh_wp_list_categories( $cat_args, TRUE );
+				echo '</ul>';
+			} else {
+				$this->core->avh_wp_dropdown_categories( $cat_args, TRUE );
+				echo '<script type=\'text/javascript\'>' . "\n";
+				echo '/* <![CDATA[ */' . "\n";
+				echo '            var ec_dropdown_' . $this->number . ' = document.getElementById("extended-categories-select-' . $this->number . '");' . "\n";
+				echo '            function ec_onCatChange_' . $this->number . '() {' . "\n";
+				echo '                if ( ec_dropdown_' . $this->number . '.options[ec_dropdown_' . $this->number . '.selectedIndex].value > 0 ) {' . "\n";
+				echo '                    location.href = "' . get_option( 'home' ) . '/?cat="+ec_dropdown_' . $this->number . '.options[ec_dropdown_' . $this->number . '.selectedIndex].value;' . "\n";
+				echo '                }' . "\n";
+				echo '            }' . "\n";
+				echo '            ec_dropdown_' . $this->number . '.onchange = ec_onCatChange_' . $this->number . ';' . "\n";
+				echo '/* ]]> */' . "\n";
+				echo '</script>' . "\n";
+			}
+			echo $after_widget;
+		}
+	}
+
+	/**
+	 * When Widget Control Form Is Posted
+	 *
+	 * @param unknown_type $new_instance
+	 * @param unknown_type $old_instance
+	 * @return unknown
+	 */
+	function update ( $new_instance, $old_instance )
+	{
+		// update the instance's settings
+		if ( ! isset( $new_instance['submit'] ) ) {
+			return FALSE;
+		}
+
+		$instance = $old_instance;
+
+		$instance['title'] = strip_tags( stripslashes( $new_instance['title'] ) );
+		$instance['count'] = $new_instance['count'] ? TRUE : FALSE;
+		$instance['hide_empty'] = $new_instance['hide_empty'] ? TRUE : FALSE;
+		$instance['use_desc_for_title'] = $new_instance['use_desc_for_title'] ? TRUE : FALSE;
+		$instance['sort_column'] = strip_tags( stripslashes( $new_instance['sort_column'] ) );
+		$instance['sort_order'] = strip_tags( stripslashes( $new_instance['sort_order'] ) );
+		$instance['style'] = strip_tags( stripslashes( $new_instance['style'] ) );
+		$instance['rssfeed'] = $new_instance['rssfeed'] ? TRUE : FALSE;
+		$instance['rssimage'] = strip_tags( stripslashes( $new_instance['rssimage'] ) );
+		return $instance;
+	}
+
+	/**
+	 *  Display Widget Control Form
+	 *
+	 * @param unknown_type $instance
+	 */
+	function form ( $instance )
+	{
+		// displays the widget admin form
+		$instance = wp_parse_args( ( array ) $instance, array ('title' => '', 'rssimage' => '' ) );
+
+		// Prepare data for display
+		$title = esc_attr( $instance['title'] );
+		$count = ( bool ) $instance['count'];
+		$hide_empty = ( bool ) $instance['hide_empty'];
+		$use_desc_for_title = ( bool ) $instance['use_desc_for_title'];
+		$sort_id = ($instance['sort_column'] == 'ID') ? ' SELECTED' : '';
+		$sort_name = ($instance['sort_column'] == 'name') ? ' SELECTED' : '';
+		$sort_count = ($instance['sort_column'] == 'count') ? ' SELECTED' : '';
+		$sort_order_a = ($instance['sort_order'] == 'asc') ? ' SELECTED' : '';
+		$sort_order_d = ($instance['sort_order'] == 'desc') ? ' SELECTED' : '';
+		$style_list = ($instance['style'] == 'list') ? ' SELECTED' : '';
+		$style_drop = ($instance['style'] == 'drop') ? ' SELECTED' : '';
+		$rssfeed = ( bool ) $instance['rssfeed'];
+		$rssimage = esc_attr( $instance['rssimage'] );
+
+		echo '<p>';
+		echo '<label for="' . $this->get_field_id( 'title' ) . '">';
+		_e( 'Title', 'avh-ec' );
+		echo '<input class="widefat" id="' . $this->get_field_id( 'title' ) . '" name="' . $this->get_field_name( 'title' ) . '" type="text" value="' . $title . '" /> ';
+		echo '</label>';
+		echo '</p>';
+
+		echo '<p>';
+
+		echo '<label for="' . $this->get_field_id( 'count' ) . '">';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'count' ) . '"	name="' . $this->get_field_name( 'count' ) . '" ' . $this->core->isChecked( TRUE, $count ) . ' /> ';
+		_e( 'Show post counts', 'avh-ec' );
+		echo '</label>';
+		echo '<br />';
+
+		echo '<label for="' . $this->get_field_id( 'hierarchical' ) . '">';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'hierarchical' ) . '" name="' . $this->get_field_name( 'hierarchical' ) . '" ' . $this->core->isChecked( TRUE, $hierarchical ) . ' /> ';
+		_e( 'Show hierarchy', 'avh-ec' );
+		echo '</label>';
+		echo '<br />';
+
+		echo '<label for="' . $this->get_field_id( 'hide_empty' ) . '">';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'hide_empty' ) . '"	name="' . $this->get_field_name( 'hide_empty' ) . '" ' . $this->core->isChecked( TRUE, $hide_empty ) . '/> ';
+		_e( 'Hide empty categories', 'avh-ec' );
+		echo '</label>';
+		echo '<br />';
+
+		echo '<label for="' . $this->get_field_id( 'use_desc_for_title' ) . '">';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'use_desc_for_title' ) . '"	name="' . $this->get_field_name( 'use_desc_for_title' ) . '" ' . $this->core->isChecked( TRUE, $use_desc_for_title ) . '/> ';
+		_e( 'Use description for title', 'avh-ec' );
+		echo '</label>';
+		echo '<br />';
+		echo '</p>';
+
+		echo '<p>';
+		echo '<label for="' . $this->get_field_id( 'sort_column' ) . '">';
+		_e( 'Sort by ', 'avh-ec' );
+		echo '<select id="' . $this->get_field_id( 'sort_column' ) . '" name="' . $this->get_field_name( 'sort_column' ) . '"> ';
+		echo '<option value="ID" ' . $sort_id . '>' . __( 'ID', 'avh-ec' ) . '</option>';
+		echo '<option value="name" ' . $sort_name . '>' . __( 'Name', 'avh-ec' ) . '</option>';
+		echo '<option value="count" ' . $sort_count . '>' . __( 'Count', 'avh-ec' ) . '</option>';
+		echo '</select>';
+		echo '</label>';
+		echo '<br />';
+
+		echo '<label for="' . $this->get_field_id( 'sort_order' ) . '">';
+		_e( 'Sort order ', 'avh-ec' );
+		echo '<select id="' . $this->get_field_id( 'sort_order' ) . '"	name="' . $this->get_field_name( 'sort_order' ) . '"> ';
+		echo '<option value="asc" ' . $sort_order_a . '>' . __( 'Ascending', 'avh-ec' ) . '</option>';
+		echo '<option value="desc" ' . $sort_order_d . '>' . __( 'Descending', 'avh-ec' ) . '</option>';
+		echo '</select>';
+		echo '</label>';
+		echo '<br />';
+
+		echo '<label for="' . $this->get_field_id( 'style' ) . '">';
+		_e( 'Display style ', 'avh-ec' );
+		echo '<select id="' . $this->get_field_id( 'style' ) . '" name="' . $this->get_field_name( 'style' ) . '"> ';
+		echo '<option value="list" ' . $style_list . '>' . __( 'List', 'avh-ec' ) . '</option>';
+		echo '<option value="drop" ' . $style_drop . '>' . __( 'Drop down', 'avh-ec' ) . '</option>';
+		echo '</select>';
+		echo '</label>';
+		echo '<br />';
+		echo '</p>';
+
+		echo '<p>';
+
+		echo '<label for="' . $this->get_field_id( 'rssfeed' ) . '">';
+		echo '<input class="checkbox" type="checkbox" id="' . $this->get_field_id( 'rssfeed' ) . '" name="' . $this->get_field_name( 'rssfeed' ) . '" ' . $this->core->isChecked( TRUE, $rssfeed ) . '/> ';
+		_e( 'Show RSS Feed', 'avh-ec' );
+		echo '</label>';
+		echo '<br />';
+
+		echo '<label for="">';
+		_e( 'Path (URI) to RSS image', 'avh-ec' );
+		echo '<input class="widefat" id="' . $this->get_field_id( 'rssimage' ) . '" name="' . $this->get_field_name( 'rssimage' ) . '" type="text" value="' . $rssimage . '" />';
+		echo '</label>';
+		echo '</p>';
+
+		echo '<input type="hidden" id="' . $this->get_field_id( 'submit' ) . '" name="' . $this->get_field_name( 'submit' ) . '" value="1" />';
+	}
+}
+
 /**
  * Class that will display the categories
  *
