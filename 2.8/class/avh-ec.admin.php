@@ -33,13 +33,6 @@ class AVH_EC_Admin
 		add_action( 'admin_menu', array (&$this, 'actionAdminMenu' ) );
 		add_filter( 'plugin_action_links_extended-categories-widget/widget_extended_categories.php', array (&$this, 'filterPluginActions' ), 10, 2 );
 
-		// Register Style and Scripts
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.dev' : '';
-		wp_register_script( 'avhec-categorygroup-js', AVHEC_PLUGIN_URL . '/js/avh-ec.categorygroup' . $suffix . '.js', array ('jquery' ), $this->core->version, true );
-		wp_register_style( 'avhec-admin-css', AVHEC_PLUGIN_URL . '/css/avh-ec.admin.css', array ('wp-admin' ), $this->core->version, 'screen' );
-
-
-
 		// Actions used for editing posts
 		add_action( 'load-post.php', array (&$this, 'actionLoadPostPage' ) );
 		add_action( 'load-page.php', array (&$this, 'actionLoadPostPage' ) );
@@ -173,6 +166,11 @@ class AVH_EC_Admin
 	function actionAdminMenu ()
 	{
 
+		// Register Style and Scripts
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.dev' : '';
+		wp_register_script( 'avhec-categorygroup-js', AVHEC_PLUGIN_URL . '/js/avh-ec.categorygroup' . $suffix . '.js', array ('jquery' ), $this->core->version, true );
+		wp_register_style( 'avhec-admin-css', AVHEC_PLUGIN_URL . '/css/avh-ec.admin.css', array ('wp-admin' ), $this->core->version, 'screen' );
+
 		// Metaboxes for the Category Group on the post and page pages
 		add_meta_box( 'avhec_category_group_box_ID', __( 'Category Group', 'avh-ec' ), array (&$this, 'metaboxPostCategoryGroup' ), 'post', 'side', 'core' );
 		add_meta_box( 'avhec_category_group_box_ID', __( 'Category Group', 'avh-ec' ), array (&$this, 'metaboxPostCategoryGroup' ), 'page', 'side', 'core' );
@@ -186,9 +184,16 @@ class AVH_EC_Admin
 		$this->hooks['menu_faq'] = add_submenu_page( $folder, 'AVH Extended Categories:' . __( 'F.A.Q', 'avh-ec' ), __( 'F.A.Q', 'avh-ec' ), 'manage_options', 'avhec-faq', array (&$this, 'doMenuFAQ' ) );
 
 		// Add actions for menu pages
+		// Overview Menu
 		add_action( 'load-' . $this->hooks['menu_overview'], array (&$this, 'actionLoadPageHook_Overview' ) );
+
+		// General Options Menu
 		add_action( 'load-' . $this->hooks['menu_general'], array (&$this, 'actionLoadPageHook_General' ) );
+
+		// Category Groups Menu
 		add_action( 'load-' . $this->hooks['menu_category_groups'], array (&$this, 'actionLoadPageHook_CategoryGroup' ) );
+
+		// FAQ Menu
 		add_action( 'load-' . $this->hooks['menu_faq'], array (&$this, 'actionLoadPageHook_faq' ) );
 	}
 
@@ -203,14 +208,18 @@ class AVH_EC_Admin
 
 		add_filter( 'screen_layout_columns', array (&$this, 'filterScreenLayoutColumns' ), 10, 2 );
 
-		// WordPress core Styles and Scripts
+		// WordPress core Scripts
 		wp_enqueue_script( 'common' );
 		wp_enqueue_script( 'wp-lists' );
 		wp_enqueue_script( 'postbox' );
+
+		// Plugin Scripts
+		wp_enqueue_script( 'avhec-categorygroup-js' );
+
+		// WordPress core Styles
 		wp_admin_css( 'css/dashboard' );
 
-		// Plugin Style and Scripts
-		wp_enqueue_script( 'avhec-categorygroup-js' );
+		// Plugin Style
 		wp_enqueue_style( 'avhec-admin-css' );
 	}
 
@@ -272,14 +281,17 @@ class AVH_EC_Admin
 
 		add_filter( 'screen_layout_columns', array (&$this, 'filterScreenLayoutColumns' ), 10, 2 );
 
-		// WordPress core Styles and Scripts
+		// WordPress core Scripts
 		wp_enqueue_script( 'common' );
 		wp_enqueue_script( 'wp-lists' );
 		wp_enqueue_script( 'postbox' );
+
+		// WordPress core Styles
 		wp_admin_css( 'css/dashboard' );
 
 		// Plugin Style and Scripts
 		wp_enqueue_style( 'avhec-admin-css' );
+
 	}
 
 	/**
@@ -427,16 +439,20 @@ class AVH_EC_Admin
 		add_meta_box( 'avhecBoxCategoryGroupList', __( 'Group Overview', 'avh-ec' ), array (&$this, 'metaboxCategoryGroupList' ), $this->hooks['menu_category_groups'], 'side', 'core' );
 
 		add_filter( 'screen_layout_columns', array (&$this, 'filterScreenLayoutColumns' ), 10, 2 );
-
-		// WordPress core Styles and Scripts
+		// WordPress core Scripts
 		wp_enqueue_script( 'common' );
 		wp_enqueue_script( 'wp-lists' );
 		wp_enqueue_script( 'postbox' );
+
+		// Plugin Scripts
 		wp_enqueue_script( 'avhec-categorygroup-js' );
+
+		// WordPress core Styles
 		wp_admin_css( 'css/dashboard' );
 
-		// Plugin Style and Scripts
+		// Plugin Style
 		wp_enqueue_style( 'avhec-admin-css' );
+
 	}
 
 	/**
@@ -670,9 +686,11 @@ class AVH_EC_Admin
 		wp_enqueue_script( 'common' );
 		wp_enqueue_script( 'wp-lists' );
 		wp_enqueue_script( 'postbox' );
+
+		// WordPress core Styles
 		wp_admin_css( 'css/dashboard' );
 
-		// Plugin Style and Scripts
+		// Plugin Style
 		wp_enqueue_style( 'avhec-admin-css' );
 
 	}
@@ -856,8 +874,7 @@ class AVH_EC_Admin
 	 *
 	 * @param $columns
 	 * @return Array
-	 * @see print_column_headers
-	 * @see get_column_headers
+	 * @see print_column_headers, get_column_headers
 	 */
 	function filterManageCategoriesGroupColumns ( $columns )
 	{

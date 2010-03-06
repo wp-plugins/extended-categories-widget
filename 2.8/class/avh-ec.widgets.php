@@ -28,12 +28,22 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 		$widget_ops = array ('description' => __( "An extended version of the default Categories widget.", 'avh-ec' ) );
 		WP_Widget::__construct( 'extended-categories', __( 'AVH Extended Categories' ), $widget_ops );
 
-		wp_enqueue_style( 'avhec-widget-css' );
+		add_action( 'wp_print_styles', array (&$this, 'actionWpPrintStyles' ) );
+
 	}
 
 	function WP_Widget_AVH_ExtendedCategories_Normal ()
 	{
 		$this->__construct();
+	}
+
+	function actionWpPrintStyles ()
+	{
+
+		if ( ! (FALSE === is_active_widget( FALSE, FALSE, $this->id_base, TRUE )) ) {
+			wp_register_style( 'avhec-widget', AVHEC_PLUGIN_URL . '/css/avh-ec.widget.css', array (), $this->core->version );
+			wp_enqueue_style( 'avhec-widget' );
+		}
 	}
 
 	/**
@@ -44,6 +54,7 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 	 */
 	function widget ( $args, $instance )
 	{
+
 		extract( $args );
 
 		$selectedonly = $instance['selectedonly'] ? TRUE : FALSE;
@@ -157,15 +168,11 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 		}
 		$instance['invert_included'] = $new_instance['invert_included'] ? TRUE : FALSE;
 
-		// If only the selected categories are to be displayed, this implies a flat view. Can't be hierarchical
-		if ( TRUE == $new_instance['selectedonly'] ) {
-			$instance['hierarchical'] = FALSE;
-		}
 		return $instance;
 	}
 
 	/**
-	 *  Display Widget Control Form
+	 * Display Widget Control Form
 	 *
 	 * @param unknown_type $instance
 	 */
@@ -332,7 +339,7 @@ class WP_Widget_AVH_ExtendedCategories_Normal extends WP_Widget
 	 */
 	function avh_wp_category_checklist ( $post_id = 0, $descendants_and_self = 0, $selected_cats = FALSE, $popular_cats = FALSE, $number, $display = 1 )
 	{
-		$walker = new AVH_Walker_Category_Checklist( );
+		$walker = new AVH_Walker_Category_Checklist();
 		$walker->number = $number;
 		$walker->input_id = $this->get_field_id( 'post_category' );
 		$walker->input_name = $this->get_field_name( 'post_category' );
@@ -401,15 +408,24 @@ class WP_Widget_AVH_ExtendedCategories_Top extends WP_Widget
 	function __construct ()
 	{
 		$this->core = & AVH_EC_Singleton::getInstance( 'AVH_EC_Core' );
-		wp_enqueue_style( 'avhec-widget-css' );
 
 		$widget_ops = array ('description' => __( "Shows the top categories.", 'avh-ec' ) );
 		WP_Widget::__construct( FALSE, __( 'AVH Extended Categories: Top Categories' ), $widget_ops );
+		add_action( 'wp_print_styles', array (&$this, 'actionWpPrintStyles' ) );
+
 	}
 
 	function WP_Widget_AVH_ExtendedCategories_Top ()
 	{
 		$this->__construct();
+	}
+
+	function actionWpPrintStyles ()
+	{
+		if ( ! (FALSE === is_active_widget( FALSE, FALSE, $this->id_base, TRUE )) ) {
+			wp_register_style( 'avhec-widget', AVHEC_PLUGIN_URL . '/css/avh-ec.widget.css', array (), $this->core->version );
+			wp_enqueue_style( 'avhec-widget' );
+		}
 	}
 
 	/** Echo the widget content.
@@ -637,15 +653,24 @@ class WP_Widget_AVH_ExtendedCategories_Category_Group extends WP_Widget
 	function __construct ()
 	{
 		$this->core = & AVH_EC_Singleton::getInstance( 'AVH_EC_Core' );
-		wp_enqueue_style( 'avhec-widget-css' );
 
 		$widget_ops = array ('description' => __( "Shows grouped categories.", 'avh-ec' ) );
 		WP_Widget::__construct( FALSE, __( 'AVH Extended Category: Category Group' ), $widget_ops );
+		add_action( 'wp_print_styles', array (&$this, 'actionWpPrintStyles' ) );
+
 	}
 
 	function WP_Widget_AVH_ExtendedCategories_Category_Group ()
 	{
 		$this->__construct();
+	}
+
+	function actionWpPrintStyles ()
+	{
+		if ( ! (FALSE === is_active_widget( FALSE, FALSE, $this->id_base, TRUE )) ) {
+			wp_register_style( 'avhec-widget', AVHEC_PLUGIN_URL . '/css/avh-ec.widget.css', array (), $this->core->version );
+			wp_enqueue_style( 'avhec-widget' );
+		}
 	}
 
 	/**
@@ -657,11 +682,13 @@ class WP_Widget_AVH_ExtendedCategories_Category_Group extends WP_Widget
 	function widget ( $args, $instance )
 	{
 		global $post;
-		$catgrp = new AVH_EC_Category_Group( );
+
+		$catgrp = new AVH_EC_Category_Group();
 		extract( $args );
 
 		$c = $instance['count'] ? TRUE : FALSE;
 		$e = $instance['hide_empty'] ? TRUE : FALSE;
+		$h = $instance['hierarchical'] ? TRUE : FALSE;
 		$use_desc_for_title = $instance['use_desc_for_title'] ? TRUE : FALSE;
 		$s = $instance['sort_column'] ? $instance['sort_column'] : 'name';
 		$o = $instance['sort_order'] ? $instance['sort_order'] : 'asc';
@@ -703,8 +730,9 @@ class WP_Widget_AVH_ExtendedCategories_Category_Group extends WP_Widget
 				$show_option_none = $options['general']['alternative_name_select_category'];
 			}
 
-			$cat_args = array ('include' => $included_cats, 'orderby' => $s, 'order' => $o, 'show_count' => $c, 'use_desc_for_title' => $use_desc_for_title, 'hide_empty' => $e, 'hierarchical' => FALSE, 'title_li' => '', 'show_option_none' => $show_option_none, 'feed' => $r, 'feed_image' => $i, 'name' => 'extended-categories-select-' . $this->number );
+			$cat_args = array ('include' => $included_cats, 'orderby' => $s, 'order' => $o, 'show_count' => $c, 'use_desc_for_title' => $use_desc_for_title, 'hide_empty' => $e, 'hierarchical' => $h, 'title_li' => '', 'show_option_none' => $show_option_none, 'feed' => $r, 'feed_image' => $i, 'name' => 'extended-categories-select-group-' . $this->number );
 			echo $before_widget;
+			echo '<div id="avhec-categorygroup-' . $row->slug . '">';
 			echo $this->core->comment;
 			echo $before_title . $title . $after_title;
 
@@ -716,7 +744,7 @@ class WP_Widget_AVH_ExtendedCategories_Category_Group extends WP_Widget
 				$this->core->avh_wp_dropdown_categories( $cat_args, TRUE );
 				echo '<script type=\'text/javascript\'>' . "\n";
 				echo '/* <![CDATA[ */' . "\n";
-				echo '            var ec_dropdown_' . $this->number . ' = document.getElementById("extended-categories-select-' . $this->number . '");' . "\n";
+				echo '            var ec_dropdown_' . $this->number . ' = document.getElementById("extended-categories-select-group-' . $this->number . '");' . "\n";
 				echo '            function ec_onCatChange_' . $this->number . '() {' . "\n";
 				echo '                if ( ec_dropdown_' . $this->number . '.options[ec_dropdown_' . $this->number . '.selectedIndex].value > 0 ) {' . "\n";
 				echo '                    location.href = "' . get_option( 'home' ) . '/?cat="+ec_dropdown_' . $this->number . '.options[ec_dropdown_' . $this->number . '.selectedIndex].value;' . "\n";
@@ -726,6 +754,7 @@ class WP_Widget_AVH_ExtendedCategories_Category_Group extends WP_Widget
 				echo '/* ]]> */' . "\n";
 				echo '</script>' . "\n";
 			}
+			echo '</div>';
 			echo $after_widget;
 		}
 	}
@@ -748,6 +777,7 @@ class WP_Widget_AVH_ExtendedCategories_Category_Group extends WP_Widget
 
 		$instance['title'] = strip_tags( stripslashes( $new_instance['title'] ) );
 		$instance['count'] = $new_instance['count'] ? TRUE : FALSE;
+		$instance['hierarchical'] = $new_instance['hierarchical'] ? TRUE : FALSE;
 		$instance['hide_empty'] = $new_instance['hide_empty'] ? TRUE : FALSE;
 		$instance['use_desc_for_title'] = $new_instance['use_desc_for_title'] ? TRUE : FALSE;
 		$instance['sort_column'] = strip_tags( stripslashes( $new_instance['sort_column'] ) );
@@ -759,7 +789,7 @@ class WP_Widget_AVH_ExtendedCategories_Category_Group extends WP_Widget
 	}
 
 	/**
-	 *  Display Widget Control Form
+	 * Display Widget Control Form
 	 *
 	 * @param unknown_type $instance
 	 */
@@ -771,6 +801,7 @@ class WP_Widget_AVH_ExtendedCategories_Category_Group extends WP_Widget
 		// Prepare data for display
 		$title = esc_attr( $instance['title'] );
 		$count = ( bool ) $instance['count'];
+		$hierarchical = ( bool ) $instance['hierarchical'];
 		$hide_empty = ( bool ) $instance['hide_empty'];
 		$use_desc_for_title = ( bool ) $instance['use_desc_for_title'];
 		$sort_id = ($instance['sort_column'] == 'ID') ? ' SELECTED' : '';

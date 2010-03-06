@@ -23,11 +23,10 @@ class AVH_EC_Core
 		 */
 		$catgrp = & AVH_EC_Singleton::getInstance( 'AVH_EC_Category_Group' );
 
-		$this->version = '3.0.2';
+		$this->version = '3.1';
 		$this->comment = '<!-- AVH Extended Categories version ' . $this->version . ' | http://blog.avirtualhome.com/wordpress-plugins/ -->';
 		$db_version = 2;
 		$this->db_options_core = 'avhec';
-
 
 		$info['siteurl'] = get_option( 'siteurl' );
 		$info['plugin_dir'] = AVHEC_PLUGIN_DIR;
@@ -56,12 +55,10 @@ class AVH_EC_Core
 
 		// Check if we have to do updates
 		if ( (! isset( $this->options['general']['dbversion'] )) || $this->options['general']['dbversion'] < $db_version ) {
-			$this->doUpdateOptions($db_version);
+			$this->doUpdateOptions( $db_version );
 		}
 
 		$this->handleTextdomain();
-
-		wp_register_style( 'avhec-widget-css', AVHEC_PLUGIN_URL . '/css/avh-ec.widget.css', array (), $this->version, 'screen' );
 	}
 
 	/**
@@ -86,14 +83,13 @@ class AVH_EC_Core
 
 	}
 
-
 	/**
 	 * Checks if running version is newer and do upgrades if necessary
 	 *
 	 * @since 1.2.3
 	 *
 	 */
-	function doUpdateOptions ($db_version)
+	function doUpdateOptions ( $db_version )
 	{
 		$options = $this->getOptions();
 
@@ -399,7 +395,7 @@ class AVH_EC_Core
 			if ( empty( $r['current_category'] ) && is_category() )
 				$r['current_category'] = $wp_query->get_queried_object_id();
 
-			if ( $hierarchical && (! $selectedonly) ) {
+			if ( $hierarchical ) {
 				$depth = $r['depth'];
 			} else {
 				$depth = - 1; // Flat.
@@ -573,7 +569,7 @@ class AVHEC_Walker_Category extends Walker
 
 		$cat_name = esc_attr( $category->name );
 		$cat_name = apply_filters( 'list_cats', $cat_name, $category );
-		$link = '<div id="avhec-widget-line"><a href="' . get_category_link( $category->term_id ) . '" ';
+		$link = '<div class="avhec-widget-line"><a href="' . get_category_link( $category->term_id ) . '" ';
 		if ( $use_desc_for_title == 0 || empty( $category->description ) )
 			$link .= 'title="' . sprintf( __( 'View all posts filed under %s' ), $cat_name ) . '"';
 		else
@@ -582,7 +578,7 @@ class AVHEC_Walker_Category extends Walker
 		$link .= $cat_name . '</a>';
 
 		if ( (! empty( $feed_image )) || (! empty( $feed )) ) {
-			$link .= '<div id="avhec-widget-rss"> ';
+			$link .= '<div class="avhec-widget-rss"> ';
 
 			if ( empty( $feed_image ) )
 				$link .= '(';
@@ -611,7 +607,7 @@ class AVHEC_Walker_Category extends Walker
 		}
 
 		if ( isset( $show_count ) && $show_count )
-			$link .= '<div id="avhec-widget-count"> (' . intval( $category->count ) . ')</div>';
+			$link .= '<div class="avhec-widget-count"> (' . intval( $category->count ) . ')</div>';
 
 		if ( isset( $show_date ) && $show_date ) {
 			$link .= ' ' . gmdate( 'Y-m-d', $category->last_update_timestamp );
