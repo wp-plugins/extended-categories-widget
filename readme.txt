@@ -8,7 +8,7 @@ Stable tag: 3.3
 
 The AVH Extended Categories Widgets gives you three widgets for displaying categories.
 == Description ==
-
+ 
 The AVH Extended Categories Widgets gives you three widgets for displaying categories.
 
 1. Replacement of the default category widget to allow for greater customization.
