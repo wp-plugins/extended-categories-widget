@@ -3,8 +3,8 @@ Contributors: petervanderdoes
 Donate link: http://blog.avirtualhome.com/wordpress-plugins/
 Tags: extended, categories, widget, top categories
 Requires at least: 2.3
-Tested up to: 3.0.5
-Stable tag: 3.3.2
+Tested up to: 3.1
+Stable tag: 3.3.3
 
 The AVH Extended Categories Widgets gives you three widgets for displaying categories.
 == Description ==
@@ -114,18 +114,18 @@ Widget 3 has association with Theater, Movie and Music
 
 Page has associations the groups Free Time and Theater
 * Widget 1: Shows categories of the Free Time group
-* Widget 2 :Shows categories of the Theater group.
+* Widget 2: Shows categories of the Theater group.
 * Widget 3: Not displayed
 
 Page has associations the group Movie.
 * Widget 1: Not displayed
-* Widget 2 :Shows categories of the Movie group.
+* Widget 2: Shows categories of the Movie group.
 * Widget 3: Not displayed
 
 
 Page has associations the groups Free Time, Movie and Music
 * Widget 1: Shows categories of the Free Time group
-* Widget 2 :Shows categories of the Movie or Music group.
+* Widget 2: Shows categories of the Movie or Music group.
 * Widget 3: Shows categories of the Music or Movie group.
 Whether Widget 2 shows Movie or Music depends on the creation order of groups. If Widget 2 shows Movie, Widget 3 will show Music but if Widget 2 shows Music, Widget 3 will show Movie.
 
@@ -133,6 +133,10 @@ Whether Widget 2 shows Movie or Music depends on the creation order of groups. I
 None
 
 == Changelog ==
+= Version 3.3.3 =
+* RFC: Changed selecting Category groups in posts from tag-like to checkboxes.
+* Removed the Menu item Category groups under Posts and Pages.
+
 = Version 3.3.2 =
 * Added several new localizations.
 * Bugfix: When using multiple Category Group widgets, all of them would show up on the special pages instead of just the one selected in the options.
