@@ -259,4 +259,4 @@ None
 * Drop down menu didn't work. Page wasn't refreshed with selected category.
 
 = Version 1.0 =
-* Initial version
+* Initial version.
