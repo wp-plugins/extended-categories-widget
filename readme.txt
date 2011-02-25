@@ -4,7 +4,7 @@ Donate link: http://blog.avirtualhome.com/wordpress-plugins/
 Tags: extended, categories, widget, top categories
 Requires at least: 2.3
 Tested up to: 3.1
-Stable tag: 3.3.3
+Stable tag: 3.3.4
 
 The AVH Extended Categories Widgets gives you three widgets for displaying categories.
 == Description ==
@@ -71,7 +71,7 @@ Translations:
 * Swedish - Svenska (sv_SE)
 * Turkish - Türkçe (tr)
 
-Some of the translations are incomplete. You can complete them or add your own language through Launchpad (https://translations.launchpad.net/avhextendedcategories/trunk)
+Some of the translations are incomplete. You can complete them or add your own language through [Launchpad](https://translations.launchpad.net/avhextendedcategories/trunk)
 
 == Installation ==
 
@@ -96,7 +96,7 @@ Here is how it works: Say you have 5 top level categories and each top level has
 You select to display all categories, select to Show hierarchy and select how many levels you want to show, in this case Toplevel only.
 
 = I want to help and translate the plug-in =
-I have setup a project in Launchpad for translating the plug-in. Just visit http://bit.ly/95WyJ
+I have setup a project in [Launchpad](https://translations.launchpad.net/avhextendedcategories/trunk) for translating the plug-in.
 
 = Multiple Category Groups =
 The following is an explanation how assigning multiple groups to page/post works.
@@ -133,6 +133,9 @@ Whether Widget 2 shows Movie or Music depends on the creation order of groups. I
 None
 
 == Changelog ==
+= Version 3.3.4 =
+* Bugfix: Problem with initializing the plugin.
+
 = Version 3.3.3 =
 * RFC: Changed selecting Category groups in posts from tag-like to checkboxes.
 * Removed the Menu item Category groups under Posts and Pages.
