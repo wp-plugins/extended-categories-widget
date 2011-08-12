@@ -136,6 +136,7 @@ None
 == Changelog ==
 = Version 3.4.2 =
 * Bugfix: Fails to display the Category Group Widget when the widget is to display any group.
+* Foo line
 
 = Version 3.4.1 =
 * Bugfix: Problems with multiple category group widgets.
