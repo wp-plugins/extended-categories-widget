@@ -135,9 +135,6 @@ Whether Widget 2 shows Movie or Music depends on the creation order of groups. I
 None
 
 == Changelog ==
-= Version 3.8.0-dev.2 =
-* Preparation for new development cycle.
-
 = Version 3.7.0 =
 * Fix uninstall
 
